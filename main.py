@@ -101,15 +101,22 @@ def get_db_connection(cfg):
 def process_data(dbconn, data, dataset):
 	#Bulk insert data into tbl_order
 	cursor = dbconn.cursor()
-	cursor.executemany('INSERT INTO tbl_order (facility, period, dimension, category, value) VALUES (%s, %s, %s, %s, %s)', data)
+	cursor.execute('TRUNCATE tbl_order')
+	cursor.executemany('REPLACE INTO tbl_order (facility, period, dimension, category, value) VALUES (%s, %s, %s, %s, %s)', data)
 	dbconn.commit() 
+	#Run cleanup stored procedures
+	cursor.callproc('proc_save_'+dataset)
+	dbconn.commit() 
+	cursor.callproc('proc_save_'+dataset+'_item')
+	dbconn.commit() 
+	#Close cursor and connection
 	cursor.close()
 	dbconn.close()
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='DHIS Reader')
 	parser.add_argument('-c','--content', help='Content to fetch', required=True, choices=['county', 'subcounty', 'datasets', 'metadata'])
-	parser.add_argument('-ds','--dataset', help='Dataset to fetch', default='D-CDRR', choices=['D-MAPS', 'F-MAPS', 'D-CDRR', 'F-CDRR'])
+	parser.add_argument('-ds','--dataset', help='Dataset to fetch', default='cdrr', choices=['maps', 'cdrr'])
 	parser.add_argument('-p','--period', help='Period to fetch', default='LAST_MONTH', choices=['THIS_MONTH', 'LAST_MONTH', 'LAST_3_MONTHS', 'LAST_6_MONTHS', 'LAST_12_MONTHS'])
 	args = vars(parser.parse_args())
 

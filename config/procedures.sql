@@ -3,10 +3,6 @@ DROP PROCEDURE IF EXISTS proc_save_cdrr;
 DELIMITER //
 CREATE PROCEDURE proc_save_cdrr()
 BEGIN
-	DECLARE bDone INT;
-	DECLARE k VARCHAR(255);
-	DECLARE v VARCHAR(255);
-
 	/*Update dhiscode to facility_id*/
 	UPDATE tbl_order o INNER JOIN tbl_facility f ON f.dhiscode = o.facility SET o.facility = f.id;
 
@@ -25,8 +21,20 @@ BEGIN
 	/*Update dimension to drug_id*/
 	UPDATE tbl_order o INNER JOIN tbl_dhis_elements de ON de.dhis_code = o.dimension SET o.dimension = de.target_id;
 
+END//
+DELIMITER ;
+
+/*Save cdrr_item*/
+DROP PROCEDURE IF EXISTS proc_save_cdrr_item;
+DELIMITER //
+CREATE PROCEDURE proc_save_cdrr_item()
+BEGIN
+	DECLARE bDone INT;
+	DECLARE k VARCHAR(255);
+	DECLARE v VARCHAR(255);
+
 	/*Upsert cdrr_item based on cdrr and drug_id*/
-	DECLARE curs CURSOR FOR  SELECT CONCAT_WS(',', GROUP_CONCAT(DISTINCT o.category SEPARATOR ','), 'cdrr_id', 'drug_id'), CONCAT_WS(',', GROUP_CONCAT(o.value SEPARATOR ','), report_id, dimension) FROM tbl_order o GROUP BY report_id, dimension;
+	DECLARE curs CURSOR FOR  SELECT CONCAT_WS(',', GROUP_CONCAT(DISTINCT o.category SEPARATOR ','), 'cdrr_id', 'drug_id'), CONCAT_WS(',', GROUP_CONCAT(o.value SEPARATOR ','), report_id, dimension) FROM tbl_order o INNER JOIN tbl_facility f ON f.id = o.facility GROUP BY o.report_id, o.dimension;
 	DECLARE CONTINUE HANDLER FOR NOT FOUND SET bDone = 1;
 
 	OPEN curs;
@@ -45,6 +53,7 @@ BEGIN
 	CLOSE curs;
 
 	TRUNCATE tbl_order;
+
 END//
 DELIMITER ;
 
@@ -53,10 +62,6 @@ DROP PROCEDURE IF EXISTS proc_save_maps;
 DELIMITER //
 CREATE PROCEDURE proc_save_maps()
 BEGIN
-	DECLARE bDone INT;
-	DECLARE k VARCHAR(255);
-	DECLARE v VARCHAR(255);
-
 	/*Update dhiscode to facility_id*/
 	UPDATE tbl_order o INNER JOIN tbl_facility f ON f.dhiscode = o.facility SET o.facility = f.id;
 
@@ -75,8 +80,20 @@ BEGIN
 	/*Update dimension to regimen_id*/
 	UPDATE tbl_order o INNER JOIN tbl_dhis_elements de ON de.dhis_code = o.dimension SET o.dimension = de.target_id;
 
+END//
+DELIMITER ;
+
+/*save maps_item*/
+DROP PROCEDURE IF EXISTS proc_save_maps_item;
+DELIMITER //
+CREATE PROCEDURE proc_save_maps_item()
+BEGIN
+	DECLARE bDone INT;
+	DECLARE k VARCHAR(255);
+	DECLARE v VARCHAR(255);
+
 	/*Upsert maps_item based on maps and regimen_id*/
-	DECLARE curs CURSOR FOR  SELECT CONCAT_WS(',', GROUP_CONCAT(DISTINCT o.category SEPARATOR ','), 'maps_id', 'regimen_id'), CONCAT_WS(',', GROUP_CONCAT(o.value SEPARATOR ','), report_id, dimension) FROM tbl_order o GROUP BY report_id, dimension;
+	DECLARE curs CURSOR FOR  SELECT CONCAT_WS(',', GROUP_CONCAT(DISTINCT o.category SEPARATOR ','), 'maps_id', 'regimen_id'), CONCAT_WS(',', GROUP_CONCAT(o.value SEPARATOR ','), report_id, dimension) FROM tbl_order o INNER JOIN tbl_facility f ON f.id = o.facility GROUP BY o.report_id, o.dimension;
 	DECLARE CONTINUE HANDLER FOR NOT FOUND SET bDone = 1;
 
 	OPEN curs;
