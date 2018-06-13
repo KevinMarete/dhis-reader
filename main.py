@@ -78,8 +78,8 @@ def get_data(server, dataUrls, category):
 			except (ValueError, TypeError):
 				pass
 			#(Dimension = Drug/Regimen and Category includes Beginning Balance)
-			data.append([ou, pe, dx, category[co], qty])
-			
+			if co in category:
+				data.append([ou, pe, dx, category[co], qty])
 
 		 #Update progress bar
 		percentage.update()
@@ -99,15 +99,16 @@ def get_db_connection(cfg):
 
 
 def process_data(dbconn, data, dataset):
+	table = cfg['tables'][dataset]
 	#Bulk insert data into tbl_order
 	cursor = dbconn.cursor()
 	cursor.execute('TRUNCATE tbl_order')
 	cursor.executemany('REPLACE INTO tbl_order (facility, period, dimension, category, value) VALUES (%s, %s, %s, %s, %s)', data)
 	dbconn.commit() 
 	#Run cleanup stored procedures
-	cursor.callproc('proc_save_'+dataset)
+	cursor.callproc('proc_save_'+table, [dataset])
 	dbconn.commit() 
-	cursor.callproc('proc_save_'+dataset+'_item')
+	cursor.callproc('proc_save_'+table+'_item')
 	dbconn.commit() 
 	#Close cursor and connection
 	cursor.close()
@@ -116,7 +117,7 @@ def process_data(dbconn, data, dataset):
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='DHIS Reader')
 	parser.add_argument('-c','--content', help='Content to fetch', required=True, choices=['county', 'subcounty', 'datasets', 'metadata'])
-	parser.add_argument('-ds','--dataset', help='Dataset to fetch', default='cdrr', choices=['maps', 'cdrr'])
+	parser.add_argument('-ds','--dataset', help='Dataset to fetch', default='D-CDRR', choices=['D-CDRR', 'F-CDRR', 'D-MAPS', 'F-MAPS'])
 	parser.add_argument('-p','--period', help='Period to fetch', default='LAST_MONTH', choices=['THIS_MONTH', 'LAST_MONTH', 'LAST_3_MONTHS', 'LAST_6_MONTHS', 'LAST_12_MONTHS'])
 	args = vars(parser.parse_args())
 

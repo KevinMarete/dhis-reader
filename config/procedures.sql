@@ -1,7 +1,9 @@
 /*Save cdrr*/
 DROP PROCEDURE IF EXISTS proc_save_cdrr;
 DELIMITER //
-CREATE PROCEDURE proc_save_cdrr()
+CREATE PROCEDURE proc_save_cdrr(
+	IN ordcode VARCHAR(15)
+	)
 BEGIN
 	/*Update dhiscode to facility_id*/
 	UPDATE tbl_order o INNER JOIN tbl_facility f ON f.dhiscode = o.facility SET o.facility = f.id;
@@ -9,8 +11,11 @@ BEGIN
 	/*Format period to period_begin date type*/
 	UPDATE tbl_order o SET o.period = DATE_FORMAT(STR_TO_DATE(o.period, '%Y%m') , "%Y-%m-01");
 
+	/*Delete data from tbl_order that exists on tbl_cdrr*/
+	DELETE o.* FROM tbl_order o INNER JOIN tbl_cdrr c ON c.period_begin = o.period AND c.facility_id = o.facility WHERE o.period = c.period_begin AND o.facility = c.facility_id;
+
 	/*Upsert cdrr from tbl_order*/
-	REPLACE INTO tbl_cdrr(status, created, code, period_begin, period_end, facility_id) SELECT 'pending' status, NOW() created, 'F-CDRR' code, o.period period_begin, LAST_DAY(o.period) period_end, o.facility facility_id FROM tbl_order o INNER JOIN tbl_facility f ON f.id = o.facility GROUP BY o.facility, o.period;
+	REPLACE INTO tbl_cdrr(status, created, code, period_begin, period_end, facility_id) SELECT 'pending' status, NOW() created, ordcode code, o.period period_begin, LAST_DAY(o.period) period_end, o.facility facility_id FROM tbl_order o INNER JOIN tbl_facility f ON f.id = o.facility GROUP BY o.facility, o.period;
 
 	/*Update report_id to cdrr_id*/
 	UPDATE tbl_order o INNER JOIN tbl_cdrr c ON c.facility_id = o.facility AND o.period = c.period_begin SET o.report_id = c.id;
@@ -60,7 +65,9 @@ DELIMITER ;
 /*Save maps*/
 DROP PROCEDURE IF EXISTS proc_save_maps;
 DELIMITER //
-CREATE PROCEDURE proc_save_maps()
+CREATE PROCEDURE proc_save_maps(
+	IN ordcode VARCHAR(15)
+	)
 BEGIN
 	/*Update dhiscode to facility_id*/
 	UPDATE tbl_order o INNER JOIN tbl_facility f ON f.dhiscode = o.facility SET o.facility = f.id;
@@ -68,8 +75,11 @@ BEGIN
 	/*Format period to period_begin date type*/
 	UPDATE tbl_order o SET o.period = DATE_FORMAT(STR_TO_DATE(o.period, '%Y%m') , "%Y-%m-01");
 
+	/*Delete data from tbl_order that exists on tbl_maps*/
+	DELETE o.* FROM tbl_order o INNER JOIN tbl_maps m ON m.period_begin = o.period AND m.facility_id = o.facility WHERE o.period = m.period_begin AND o.facility = m.facility_id;
+
 	/*Upsert maps from tbl_order*/
-	REPLACE INTO tbl_maps(status, created, code, period_begin, period_end, facility_id) SELECT 'pending' status, NOW() created, 'F-MAPS' code, o.period period_begin, LAST_DAY(o.period) period_end, o.facility facility_id FROM tbl_order o INNER JOIN tbl_facility f ON f.id = o.facility GROUP BY o.facility, o.period;
+	REPLACE INTO tbl_maps(status, created, code, period_begin, period_end, facility_id) SELECT 'pending' status, NOW() created, ordcode code, o.period period_begin, LAST_DAY(o.period) period_end, o.facility facility_id FROM tbl_order o INNER JOIN tbl_facility f ON f.id = o.facility GROUP BY o.facility, o.period;
 
 	/*Update report_id to maps_id*/
 	UPDATE tbl_order o INNER JOIN tbl_maps m ON m.facility_id = o.facility AND o.period = m.period_begin SET o.report_id = m.id;
