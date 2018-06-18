@@ -18,16 +18,15 @@ def get_content(server, datanURL, dataIndex):
 def get_metadata(server, metadataURL, elementURL, dataset):
 	meta = server.get(metadataURL.format(dataset)).json()
 	
-	#Get datasetname, organisation_units, data_elements, category_options
+	#Get datasetname, data_elements, category_options
 	dataset_name = meta['dataSets'][0]['name']
-	organisation_units = [dhiscode for facility in meta['dataSets'][0]['organisationUnits'] for dhiscode in facility.values()]
 	data_elements = [element.get('id') for element in meta.get('dataElements')]
 	category_options = [options.get('id') for options in meta.get('categoryOptions')]
 
 	#Remove elements that have date values (don't allow aggregation)
 	[data_elements.remove(element) for element in data_elements if server.get(elementURL.format(element)).json().get('valueType') == 'DATE']
 
-	return organisation_units, data_elements, category_options, dataset_name
+	return data_elements, category_options, dataset_name
 
 def get_data_urls(organisation_units, data_elements, category_options, dataset_name, analyticsURL, period):
     _orgchunk = 100
@@ -133,13 +132,15 @@ if __name__ == '__main__':
 
 	#Get server connection
 	serverObj = get_server_connection(dhis_url, dhis_username, dhis_password)
+	serverObjLive = get_server_connection(dhis_url, cfg['dhis_live']['username'], cfg['dhis_live']['password'])
 
 	#Get content
 	if(content == 'metadata'):
 		dataset = args['dataset']
-		organisation_units, data_elements, category_options, dataset_name = get_metadata(serverObj, cfg['urls'][content], cfg['urls']['element'], cfg['datasets'][dataset])
+		organisation_units = [dhiscode for dhiscode in get_content(serverObj, cfg['urls']['facility'], cfg['indices']['facility'])]
+		data_elements, category_options, dataset_name = get_metadata(serverObj, cfg['urls'][content], cfg['urls']['element'], cfg['datasets'][dataset])
 		dataUrls = get_data_urls(organisation_units, data_elements, category_options, dataset_name, cfg['urls']['analytics'], args['period'])
-		data = get_data(serverObj, dataUrls, cfg['category'])
+		data = get_data(serverObjLive, dataUrls, cfg['category'])
 		dbconn = get_db_connection(cfg['database'])
 		process_data(dbconn, data, dataset)
 	else:
