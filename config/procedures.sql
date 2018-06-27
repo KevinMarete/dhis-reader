@@ -124,3 +124,33 @@ BEGIN
 	TRUNCATE tbl_order;
 END//
 DELIMITER ;
+
+/*update dhis data on tbl_facility*/
+DROP PROCEDURE IF EXISTS proc_update_dhis;
+DELIMITER //
+CREATE PROCEDURE proc_update_dhis(
+    IN f_code VARCHAR(20),
+    IN f_name VARCHAR(150), 
+    IN f_category VARCHAR(20),
+    IN f_dhiscode VARCHAR(50),
+    IN f_longitude VARCHAR(200),
+    IN f_latitude VARCHAR(200),
+    IN f_parent_mfl VARCHAR(20)
+    )
+BEGIN
+    DECLARE parent INT DEFAULT NULL;
+    SET f_name = LOWER(f_name);
+
+    SELECT id INTO parent FROM tbl_facility WHERE mflcode = f_parent_mfl;
+
+	IF (parent = f_code) THEN 
+		SET f_category = 'central';
+	END IF;
+
+    IF NOT EXISTS(SELECT * FROM tbl_facility WHERE mflcode = f_code) THEN
+        INSERT INTO tbl_facility(name, mflcode, category, dhiscode, longitude, latitude, parent_id) VALUES(f_name, f_code, f_category, f_dhiscode, f_longitude, f_latitude, parent);
+    ELSE
+        UPDATE tbl_facility SET category = f_category, dhiscode = f_dhiscode, longitude = f_longitude, latitude = f_latitude, parent_id = parent WHERE mflcode = f_code; 
+    END IF;
+END//
+DELIMITER ;

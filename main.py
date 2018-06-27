@@ -11,9 +11,24 @@ def get_server_connection(serverUrl, username, password):
     server.mount(serverUrl, adapter)
     return server
 
-def get_content(server, datanURL, dataIndex):
-    response = server.get(datanURL).json()
+def get_content(server, dataURL, dataIndex):
+    response = server.get(dataURL).json()
     return {org['id']:org['displayName'] for org in response[dataIndex]}
+
+def get_org_content(server, dataURL, dataIndex, category):
+	orgs = []
+	response = server.get(dataURL).json()
+	if response and dataIndex in response:
+		for org in response[dataIndex]:
+			if 'code' in org:
+				longitude = ''
+				latitude = ''
+				if 'coordinates' in org and org['coordinates'] != '#N/A' and org['coordinates'] != '':
+					coordinates = org['coordinates'].replace('[', '').replace(']', '').split(',')
+					longitude = coordinates[0]
+					latitude = coordinates[1]
+				orgs.append([org['code'], org['name'], category, org['id'], longitude, latitude])
+	return orgs
 
 def get_metadata(server, metadataURL, elementURL, dataset):
 	meta = server.get(metadataURL.format(dataset)).json()
@@ -80,7 +95,7 @@ def get_data(server, dataUrls, category):
 			if co in category:
 				data.append([ou, pe, dx, category[co], qty])
 
-		 #Update progress bar
+		#Update progress bar
 		percentage.update()
 	return data
 
@@ -113,9 +128,26 @@ def process_data(dbconn, data, dataset):
 	cursor.close()
 	dbconn.close()
 
+def save_orgs(dbconn, data, parent_mfl = None):
+	cursor = dbconn.cursor()
+	for org in data:
+		if parent_mfl == None:
+			org.append(org[0])
+		else:
+			org.append(parent_mfl)
+		#Run proc	
+		try:
+			cursor.callproc('proc_update_dhis', org)
+		except Exception, e:
+			print org
+			print e
+		dbconn.commit() 
+	#Close cursor
+	cursor.close()
+
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='DHIS Reader')
-	parser.add_argument('-c','--content', help='Content to fetch', required=True, choices=['county', 'subcounty', 'datasets', 'metadata'])
+	parser.add_argument('-c','--content', help='Content to fetch', required=True, choices=['county', 'subcounty', 'datasets', 'metadata', 'central', 'standalone'])
 	parser.add_argument('-ds','--dataset', help='Dataset to fetch', default='D-CDRR', choices=['D-CDRR', 'F-CDRR', 'D-MAPS', 'F-MAPS'])
 	parser.add_argument('-p','--period', help='Period to fetch', default='LAST_MONTH', choices=['THIS_MONTH', 'LAST_MONTH', 'LAST_3_MONTHS', 'LAST_6_MONTHS', 'LAST_12_MONTHS'])
 	args = vars(parser.parse_args())
@@ -134,6 +166,9 @@ if __name__ == '__main__':
 	serverObj = get_server_connection(dhis_url, dhis_username, dhis_password)
 	serverObjLive = get_server_connection(dhis_url, cfg['dhis_live']['username'], cfg['dhis_live']['password'])
 
+	#Get database connection
+	dbconn = get_db_connection(cfg['database'])
+
 	#Get content
 	if(content == 'metadata'):
 		dataset = args['dataset']
@@ -141,7 +176,31 @@ if __name__ == '__main__':
 		data_elements, category_options, dataset_name = get_metadata(serverObj, cfg['urls'][content], cfg['urls']['element'], cfg['datasets'][dataset])
 		dataUrls = get_data_urls(organisation_units, data_elements, category_options, dataset_name, cfg['urls']['analytics'], args['period'])
 		data = get_data(serverObjLive, dataUrls, cfg['category'])
-		dbconn = get_db_connection(cfg['database'])
 		process_data(dbconn, data, dataset)
 	else:
-		print get_content(serverObj, cfg['urls'][content], cfg['indices'][content])
+		if content in ['county', 'subcounty', 'datasets']:
+			print get_content(serverObj, cfg['urls'][content], cfg['indices'][content])
+		elif content in ['central']:
+			#Get central sites
+			central_sites = get_org_content(serverObj, cfg['urls'][content], cfg['indices'][content], content)
+			save_orgs(dbconn, central_sites)
+			central_ids = [site[3] for site in central_sites]
+			#Get central site groups
+			response = serverObj.get(cfg['urls']['central_grp']).json()
+			central_grps = response[cfg['indices']['central_grp']]
+			percentage = pyprind.ProgPercent(len(central_grps)) #Progress bar
+			for central_grp in central_grps:
+				parent_mfl = None
+				#Get satellites of central site groups
+				satelliteURL = cfg['urls']['satellite'].format(central_grp['id'])
+				satellites = get_org_content(serverObj, satelliteURL, cfg['indices']['satellite'], 'satellite')
+				for satellite in satellites:
+					if satellite[3] in central_ids:
+						parent_mfl = satellite[0]
+				save_orgs(dbconn, satellites, parent_mfl)
+				#Update progress bar
+				percentage.update()
+			
+		else: 
+			orgs = get_org_content(serverObj, cfg['urls'][content], cfg['indices'][content], content)
+			save_orgs(dbconn, orgs)
