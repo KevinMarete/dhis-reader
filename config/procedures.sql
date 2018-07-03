@@ -143,10 +143,6 @@ BEGIN
 
     SELECT id INTO parent FROM tbl_facility WHERE mflcode = f_parent_mfl;
 
-	IF (parent = f_code) THEN 
-		SET f_category = 'central';
-	END IF;
-
     IF NOT EXISTS(SELECT * FROM tbl_facility WHERE mflcode = f_code) THEN
         INSERT INTO tbl_facility(name, mflcode, category, dhiscode, longitude, latitude, parent_id) VALUES(f_name, f_code, f_category, f_dhiscode, f_longitude, f_latitude, parent);
     ELSE

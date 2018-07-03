@@ -135,13 +135,15 @@ def save_orgs(dbconn, data, parent_mfl = None):
 			org.append(org[0])
 		else:
 			org.append(parent_mfl)
+			if org[0] == parent_mfl:
+				org[2] = 'central'
 		#Run proc	
 		try:
 			cursor.callproc('proc_update_dhis', org)
+			dbconn.commit() 
 		except Exception, e:
 			print org
 			print e
-		dbconn.commit() 
 	#Close cursor
 	cursor.close()
 
