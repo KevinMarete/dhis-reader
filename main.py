@@ -123,7 +123,11 @@ def process_data(dbconn, data, dataset):
 	cursor.callproc('proc_save_'+table, [dataset])
 	dbconn.commit() 
 	cursor.callproc('proc_save_'+table+'_item')
-	dbconn.commit() 
+	dbconn.commit()
+	#Run central procs
+	if dataset in ['D-CDRR', 'D-MAPS']:
+		cursor.callproc('proc_update_central_'+table)
+		dbconn.commit()
 	#Close cursor and connection
 	cursor.close()
 	dbconn.close()
@@ -166,7 +170,6 @@ if __name__ == '__main__':
 
 	#Get server connection
 	serverObj = get_server_connection(dhis_url, dhis_username, dhis_password)
-	serverObjLive = get_server_connection(dhis_url, cfg['dhis_live']['username'], cfg['dhis_live']['password'])
 
 	#Get database connection
 	dbconn = get_db_connection(cfg['database'])
@@ -177,7 +180,7 @@ if __name__ == '__main__':
 		organisation_units = [dhiscode for dhiscode in get_content(serverObj, cfg['urls']['facility'], cfg['indices']['facility'])]
 		data_elements, category_options, dataset_name = get_metadata(serverObj, cfg['urls'][content], cfg['urls']['element'], cfg['datasets'][dataset])
 		dataUrls = get_data_urls(organisation_units, data_elements, category_options, dataset_name, cfg['urls']['analytics'], args['period'])
-		data = get_data(serverObjLive, dataUrls, cfg['category'])
+		data = get_data(serverObj, dataUrls, cfg['category'])
 		process_data(dbconn, data, dataset)
 	else:
 		if content in ['county', 'subcounty', 'datasets']:

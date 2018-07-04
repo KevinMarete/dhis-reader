@@ -150,3 +150,72 @@ BEGIN
     END IF;
 END//
 DELIMITER ;
+
+/*update D-CDRR aggregate_data*/
+DROP PROCEDURE IF EXISTS proc_update_central_cdrr;
+DELIMITER //
+CREATE PROCEDURE proc_update_central_cdrr()
+BEGIN
+    REPLACE INTO tbl_cdrr_item (aggr_consumed, aggr_on_hand, cdrr_id, drug_id)
+	SELECT t.aggr_consumed, t.aggr_on_hand, c.id, t.drug_id
+	FROM tbl_cdrr_item ci 
+	INNER JOIN tbl_cdrr c ON c.id = ci.cdrr_id
+	RIGHT JOIN (
+		SELECT
+			f.parent_id facility_id,
+			c.period_begin, 
+			c.period_end, 
+			ci.drug_id,
+			SUM(ci.dispensed_packs) aggr_consumed,
+			SUM(ci.count) aggr_on_hand
+		FROM tbl_cdrr_item ci
+		INNER JOIN tbl_cdrr c ON c.id = ci.cdrr_id
+		INNER JOIN tbl_facility f ON f.id = c.facility_id
+		WHERE c.code = 'F-CDRR'
+		AND (c.period_begin, c.period_end, f.parent_id) IN (
+			SELECT c.period_begin, c.period_end, c.facility_id 
+			FROM tbl_cdrr c
+			WHERE c.code = 'D-CDRR'
+			GROUP BY c.period_begin, c.period_end, c.facility_id
+		)
+		GROUP BY f.parent_id, c.period_begin, c.period_end, ci.drug_id
+		ORDER BY f.parent_id, c.period_begin, c.period_end, ci.drug_id
+	) t ON t.facility_id = c.facility_id AND t.period_begin = c.period_begin AND t.period_end = c.period_end AND c.code = 'D-CDRR'
+	GROUP BY t.aggr_consumed, t.aggr_on_hand, c.id, t.drug_id
+	ORDER BY c.id, t.drug_id;
+END//
+DELIMITER ;
+
+/*update D-MAPS totals*/
+DROP PROCEDURE IF EXISTS proc_update_central_maps;
+DELIMITER //
+CREATE PROCEDURE proc_update_central_maps()
+BEGIN
+    REPLACE INTO tbl_maps_item (total, maps_id, regimen_id)
+	SELECT t.total, m.id, t.regimen_id
+	FROM tbl_maps_item mi 
+	INNER JOIN tbl_maps m ON m.id = mi.maps_id
+	RIGHT JOIN (
+		SELECT
+			f.parent_id facility_id,
+			m.period_begin, 
+			m.period_end, 
+			mi.regimen_id,
+			SUM(mi.total) total
+		FROM tbl_maps_item mi
+		INNER JOIN tbl_maps m ON m.id = mi.maps_id
+		INNER JOIN tbl_facility f ON f.id = m.facility_id
+		WHERE m.code = 'F-MAPS'
+		AND (m.period_begin, m.period_end, f.parent_id) IN (
+			SELECT m.period_begin, m.period_end, m.facility_id 
+			FROM tbl_maps m
+			WHERE m.code = 'D-MAPS'
+			GROUP BY m.period_begin, m.period_end, m.facility_id
+		)
+		GROUP BY f.parent_id, m.period_begin, m.period_end, mi.regimen_id
+		ORDER BY f.parent_id, m.period_begin, m.period_end, mi.regimen_id
+	) t ON t.facility_id = m.facility_id AND t.period_begin = m.period_begin AND t.period_end = m.period_end AND m.code = 'D-MAPS'
+	GROUP BY t.total, m.id, t.regimen_id
+	ORDER BY m.id, t.regimen_id;
+END//
+DELIMITER ;
