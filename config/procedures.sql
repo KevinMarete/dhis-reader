@@ -156,12 +156,13 @@ DROP PROCEDURE IF EXISTS proc_update_central_cdrr;
 DELIMITER //
 CREATE PROCEDURE proc_update_central_cdrr()
 BEGIN
-    REPLACE INTO tbl_cdrr_item (aggr_consumed, aggr_on_hand, cdrr_id, drug_id)
-	SELECT t.aggr_consumed, t.aggr_on_hand, c.id, t.drug_id
+    REPLACE INTO tbl_cdrr_item (balance, received, dispensed_packs, losses, adjustments, adjustments_neg, count, expiry_quant, expiry_date, out_of_stock, resupply, aggr_consumed, aggr_on_hand, cdrr_id, drug_id, qty_allocated, feedback)
+	SELECT ci.balance, ci.received, ci.dispensed_packs, ci.losses, ci.adjustments, ci.adjustments_neg, ci.count, ci.expiry_quant, ci.expiry_date, ci.out_of_stock, ci.resupply, t.aggr_consumed, t.aggr_on_hand, t.cdrr_id, t.drug_id, ci.qty_allocated, ci.feedback
 	FROM tbl_cdrr_item ci 
 	INNER JOIN tbl_cdrr c ON c.id = ci.cdrr_id
 	RIGHT JOIN (
 		SELECT
+			dc.id cdrr_id,			
 			f.parent_id facility_id,
 			c.period_begin, 
 			c.period_end, 
@@ -171,6 +172,7 @@ BEGIN
 		FROM tbl_cdrr_item ci
 		INNER JOIN tbl_cdrr c ON c.id = ci.cdrr_id
 		INNER JOIN tbl_facility f ON f.id = c.facility_id
+		INNER JOIN tbl_cdrr dc ON dc.facility_id = f.parent_id AND dc.period_begin = c.period_begin AND dc.period_end = c.period_end AND dc.code = 'D-CDRR'
 		WHERE c.code = 'F-CDRR'
 		AND (c.period_begin, c.period_end, f.parent_id) IN (
 			SELECT c.period_begin, c.period_end, c.facility_id 
@@ -180,9 +182,9 @@ BEGIN
 		)
 		GROUP BY f.parent_id, c.period_begin, c.period_end, ci.drug_id
 		ORDER BY f.parent_id, c.period_begin, c.period_end, ci.drug_id
-	) t ON t.facility_id = c.facility_id AND t.period_begin = c.period_begin AND t.period_end = c.period_end AND c.code = 'D-CDRR'
-	GROUP BY t.aggr_consumed, t.aggr_on_hand, c.id, t.drug_id
-	ORDER BY c.id, t.drug_id;
+	) t ON t.facility_id = c.facility_id AND t.period_begin = c.period_begin AND t.period_end = c.period_end AND c.code = 'D-CDRR' AND ci.drug_id = t.drug_id
+	GROUP BY t.cdrr_id, t.drug_id
+	ORDER BY t.cdrr_id, t.drug_id;
 END//
 DELIMITER ;
 
