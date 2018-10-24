@@ -221,3 +221,30 @@ BEGIN
 	ORDER BY m.id, t.regimen_id;
 END//
 DELIMITER ;
+
+/*proc_dhis_to_dsh (CONCEPT)*/
+DELIMITER //
+CREATE OR REPLACE PROCEDURE proc_dhis_to_dsh(
+    IN p_begin DATE()
+    )
+BEGIN
+    /*tbl_consumption*/
+    REPLACE INTO tbl_consumption(total, period_year, period_month, facility_id, drug_id) SELECT SUM(ci.dispensed_packs) dispensed, YEAR(c.period_begin) period_year, MONTHNAME(c.period_begin) period_month, c.facility_id, ci.drug_id FROM tbl_cdrr_item ci INNER JOIN tbl_cdrr c ON c.id = ci.cdrr_id WHERE c.period_begin = p_begin AND c.code = 'F-CDRR' GROUP BY c.facility_id, ci.drug_id, c.period_begin; 
+
+    /*tbl_patient*/
+    REPLACE INTO tbl_patient (total, period_year, period_month, regimen_id, facility_id) SELECT SUM(mi.total) total, YEAR(m.period_begin) period_year, MONTHNAME(m.period_begin) period_month, mi.regimen_id, m.facility_id FROM tbl_maps_item mi INNER JOIN tbl_maps m ON m.id = mi.maps_id WHERE m.period_begin = p_begin AND m.code = 'F-MAPS' GROUP BY m.facility_id, mi.regimen_id, m.period_begin; 
+
+    /*tbl_stock*/
+    REPLACE INTO tbl_stock (total, period_year, period_month, facility_id, drug_id) SELECT SUM(ci.count) soh, YEAR(c.period_begin) period_year, MONTHNAME(c.period_begin) period_month, c.facility_id, ci.drug_id FROM tbl_cdrr_item ci INNER JOIN tbl_cdrr c ON c.id = ci.cdrr_id WHERE c.period_begin = p_begin GROUP BY c.facility_id, ci.drug_id, c.period_begin; 
+
+    /*tbl_kemsa*/
+    REPLACE INTO tbl_kemsa(issue_total, soh_total, supplier_total, received_total, period_year, period_month, drug_id) SELECT SUM(p.issues_kemsa) issues, s.supplier, SUM(p.receipts_kemsa) receipts, SUM(p.close_kemsa) close_bal, p.transaction_year, p.transaction_month, p.drug_id FROM tbl_procurement p INNER JOIN (SELECT p.drug_id, SUM(quantity) supplier FROM tbl_procurement p  INNER JOIN tbl_procurement_item pi ON pi.procurement_id = p.id WHERE STR_TO_DATE(CONCAT(CONCAT_WS('-', p.transaction_year, p.transaction_month), '-01'), '%Y-%b-%d') > p_begin GROUP BY p.drug_id) s ON s.drug_id = p.drug_id WHERE STR_TO_DATE(CONCAT(CONCAT_WS('-', p.transaction_year, p.transaction_month), '-01'), '%Y-%b-%d') = p_begin GROUP BY p.drug_id, p.transaction_year, p.transaction_month;
+
+    /*tbl_procurement (monthly-consumption)*/
+    UPDATE tbl_procurement p INNER JOIN (SELECT SUM(ci.dispensed_packs) consumed, YEAR(c.period_begin) transaction_year, DATE_FORMAT(c.period_begin, '%b') transaction_month, ci.drug_id  FROM tbl_cdrr_item ci INNER JOIN tbl_cdrr c ON c.id = ci.cdrr_id WHERE c.period_begin = p_begin AND c.code = 'F-CDRR' GROUP BY ci.drug_id, c.period_begin) t  ON t.drug_id = p.drug_id AND t.transaction_year = p.transaction_year AND t.transaction_month = p.transaction_month SET p.monthly_consumption = t.consumed;
+
+    /*Fix recieved order yet date not reached*/
+    UPDATE tbl_procurement_item pi INNER JOIN tbl_procurement p ON p.id = pi.procurement_id SET pi.procurement_status_id = '2' WHERE pi.procurement_status_id = '3' AND STR_TO_DATE(CONCAT(CONCAT_WS('-', p.transaction_year, p.transaction_month), '-01'), '%Y-%b-%d') > p_begin;
+
+END//
+DELIMITER ;
