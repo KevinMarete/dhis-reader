@@ -43,13 +43,36 @@ def get_metadata(server, metadataURL, elementURL, dataset):
 
 	return data_elements, category_options, dataset_name
 
-def get_data_urls(organisation_units, data_elements, category_options, dataset_name, analyticsURL, period):
-    _orgchunk = 100
-    _orgchunks = [organisation_units[i:i + _orgchunk] for i in range(0, len(organisation_units), _orgchunk)]
-    urls = [analyticsURL.format(period, ';'.join(chunk), ';'.join(data_elements), ';'.join(category_options)) for chunk in _orgchunks]
-    return urls
+def get_period_dates(period_str):
+	import datetime
+	from dateutil.relativedelta import relativedelta
+
+	period_dates = []
+	period_list = {'LAST_MONTH': 2, 'LAST_3_MONTHS': 4, 'LAST_6_MONTHS': 7, 'LAST_12_MONTHS': 13}
+	i = 1
+	d = datetime.date.today()
+
+	while i < period_list[period_str]:
+		d2 = d - relativedelta(months=i)
+		i += 1
+		period_dates.append(d2.strftime('%Y%m'))
+
+	return period_dates
+
+def get_data_urls(organisation_units, data_elements, category_options, dataset_name, datavaluesURL, period_str):
+	_orgchunk = 100
+	_orgchunks = [organisation_units[i:i + _orgchunk] for i in range(0, len(organisation_units), _orgchunk)]
+	for period_date in get_period_dates(period_str):
+		urls = [datavaluesURL.format(dataset_name, period_date, '&orgUnit='.join(chunk)) for chunk in _orgchunks]
+	return urls
 
 def get_data(server, dataUrls, category):
+	data = []
+	percentage = pyprind.ProgPercent(len(dataUrls)) #Progress bar
+	for dataUrl in dataUrls:
+		response = server.get(dataUrl).json()
+
+def get_data_tmp(server, dataUrls, category):
 	data = []
 	percentage = pyprind.ProgPercent(len(dataUrls)) #Progress bar
 	for dataUrl in dataUrls:
@@ -155,7 +178,7 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='DHIS Reader')
 	parser.add_argument('-c','--content', help='Content to fetch', required=True, choices=['county', 'subcounty', 'datasets', 'metadata', 'central', 'standalone'])
 	parser.add_argument('-ds','--dataset', help='Dataset to fetch', default='D-CDRR', choices=['D-CDRR', 'F-CDRR', 'D-MAPS', 'F-MAPS'])
-	parser.add_argument('-p','--period', help='Period to fetch', default='LAST_MONTH', choices=['THIS_MONTH', 'LAST_MONTH', 'LAST_3_MONTHS', 'LAST_6_MONTHS', 'LAST_12_MONTHS'])
+	parser.add_argument('-p','--period', help='Period to fetch', default='LAST_MONTH', choices=['LAST_MONTH', 'LAST_3_MONTHS', 'LAST_6_MONTHS', 'LAST_12_MONTHS'])
 	args = vars(parser.parse_args())
 
 	#Get configuration
@@ -179,7 +202,7 @@ if __name__ == '__main__':
 		dataset = args['dataset']
 		organisation_units = [dhiscode for dhiscode in get_content(serverObj, cfg['urls']['facility'], cfg['indices']['facility'])]
 		data_elements, category_options, dataset_name = get_metadata(serverObj, cfg['urls'][content], cfg['urls']['element'], cfg['datasets'][dataset])
-		dataUrls = get_data_urls(organisation_units, data_elements, category_options, dataset_name, cfg['urls']['analytics'], args['period'])
+		dataUrls = get_data_urls(organisation_units, data_elements, category_options, cfg['datasets'][dataset], cfg['urls']['datavalues'], args['period'])
 		data = get_data(serverObj, dataUrls, cfg['category'])
 		process_data(dbconn, data, dataset)
 	else:
