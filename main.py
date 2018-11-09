@@ -13,7 +13,7 @@ def get_server_connection(serverUrl, username, password):
 
 def get_content(server, dataURL, dataIndex):
     response = server.get(dataURL).json()
-    return {org['id']:org['displayName'] for org in response[dataIndex]}
+    return {org['id']:org['name'] for org in response[dataIndex]}
 
 def get_org_content(server, dataURL, dataIndex, category):
 	orgs = []
@@ -43,58 +43,44 @@ def get_metadata(server, metadataURL, elementURL, dataset):
 
 	return data_elements, category_options, dataset_name
 
-def get_data_urls(organisation_units, data_elements, category_options, dataset_name, analyticsURL, period):
-    _orgchunk = 100
-    _orgchunks = [organisation_units[i:i + _orgchunk] for i in range(0, len(organisation_units), _orgchunk)]
-    urls = [analyticsURL.format(period, ';'.join(chunk), ';'.join(data_elements), ';'.join(category_options)) for chunk in _orgchunks]
-    return urls
+def get_period_dates(period_str):
+	import datetime
+	from dateutil.relativedelta import relativedelta
 
-def get_data(server, dataUrls, category):
+	period_dates = []
+	period_list = {'LAST_MONTH': 2, 'LAST_3_MONTHS': 4, 'LAST_6_MONTHS': 7, 'LAST_9_MONTHS': 10, 'LAST_12_MONTHS': 13}
+	i = 1
+	d = datetime.date.today()
+
+	while i < period_list[period_str]:
+		d2 = d - relativedelta(months=i)
+		i += 1
+		period_dates.append(d2.strftime('%Y%m'))
+
+	return period_dates
+
+def get_data_urls(organisation_units, data_elements, category_options, dataset_name, datavaluesURL, period_str):
+	_orgchunk = 100
+	_orgchunks = [organisation_units[i:i + _orgchunk] for i in range(0, len(organisation_units), _orgchunk)]
+	for period_date in get_period_dates(period_str):
+		if dataset_name in ['rk2yudsNrm5', 'ZddkIXm6FDw']:
+			urls = [datavaluesURL.format(dataset_name, period_date, '&orgUnitGroup='.join(chunk)) for chunk in _orgchunks]
+		else:
+			urls = [datavaluesURL.format(dataset_name, period_date, '&orgUnit='.join(chunk)) for chunk in _orgchunks]
+	return urls
+
+def get_data(server, dataUrls, category, dataset, dbconn):
 	data = []
+	category_keys = [str(a) for a in category.keys()]
 	percentage = pyprind.ProgPercent(len(dataUrls)) #Progress bar
 	for dataUrl in dataUrls:
 		response = server.get(dataUrl).json()
-		rows = response['rows']
-		if not rows:
-			continue  #if no rows, go to next URL
-
-		metanames = response['metaData']['items'] #dictionary of codes
-		hierarchy = response['metaData']['ouHierarchy'] #dictionary of orgs
-
-		#Create a reference for county, subcounty & facility names
-		cleanhierarchy = {}
-		for facility in hierarchy:
-			#facility would have 4 parents - skip non facilities
-			if len(hierarchy[facility].split('/')) != 4:
-				continue
-
-			countrycode, countycode, subcountycode, wardcode = hierarchy[facility].split('/')
-
-			facilityname = metanames[facility]['name']
-			county = metanames[countycode]['name']
-			subcounty = metanames[subcountycode]['name']
-			#Clean dictionary hierarchy of orgs
-			cleanhierarchy[facility] = [county, subcounty, facilityname]
-
-		#Process the rows returned (dx = data_element, co = category, ou = organisation_unit, qty = quantity)
-		for row in rows:
-			dx, co, pe, ou, qty = row
-			dxname = metanames[dx]['name']
-			coname = metanames[co]['name']
-
-			#skip rows for non-facility (check above)
-			if ou not in cleanhierarchy:
-				continue
-
-			county, subcounty, facilityname = cleanhierarchy[ou]
-			try:
-				qty = float(qty)
-			except (ValueError, TypeError):
-				pass
-			#(Dimension = Drug/Regimen and Category includes Beginning Balance)
-			if co in category:
-				data.append([ou, pe, dx, category[co], qty])
-
+		if 'dataValues' in response.keys():
+			values = response['dataValues']
+			for value in values:
+				categoryOptionCombo = value['categoryOptionCombo'].lower()
+				if 'value' in value.keys() and categoryOptionCombo in category_keys:
+					data.append([value['orgUnit'], value['period'], value['dataElement'], category[categoryOptionCombo], value['value']])
 		#Update progress bar
 		percentage.update()
 	return data
@@ -107,27 +93,27 @@ def get_db_connection(cfg):
 		'port': int(cfg["port"]),
 		'database': str(cfg["dbname"]),
 		'charset': 'utf8mb4',
-		'cursorclass': pymysql.cursors.Cursor
+		'cursorclass': pymysql.cursors.DictCursor
 	}
 	return pymysql.connect(**dbcfg)
 
-
 def process_data(dbconn, data, dataset):
 	table = cfg['tables'][dataset]
-	#Bulk insert data into tbl_order
-	cursor = dbconn.cursor()
-	cursor.execute('TRUNCATE tbl_order')
-	cursor.executemany('REPLACE INTO tbl_order (facility, period, dimension, category, value) VALUES (%s, %s, %s, %s, %s)', data)
-	dbconn.commit() 
-	#Run cleanup stored procedures
-	cursor.callproc('proc_save_'+table, [dataset])
-	dbconn.commit() 
-	cursor.callproc('proc_save_'+table+'_item')
-	dbconn.commit()
-	#Run central procs
-	if dataset in ['D-CDRR', 'D-MAPS']:
-		cursor.callproc('proc_update_central_'+table)
-		dbconn.commit()
+	try:
+		cursor = dbconn.cursor()
+		if len(data) != 0:
+			#Bulk insert data into tbl_order
+			cursor.execute('TRUNCATE tbl_order')
+			cursor.executemany('REPLACE INTO tbl_order (facility, period, dimension, category, value) VALUES (%s, %s, %s, %s, %s)', data)
+			dbconn.commit() 
+			#Run cleanup stored procedures
+			cursor.callproc('proc_save_'+table, [dataset])
+			dbconn.commit() 
+			cursor.callproc('proc_save_'+table+'_item')
+			dbconn.commit()
+	except Exception, e:
+		print e
+
 	#Close cursor and connection
 	cursor.close()
 	dbconn.close()
@@ -155,7 +141,7 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='DHIS Reader')
 	parser.add_argument('-c','--content', help='Content to fetch', required=True, choices=['county', 'subcounty', 'datasets', 'metadata', 'central', 'standalone'])
 	parser.add_argument('-ds','--dataset', help='Dataset to fetch', default='D-CDRR', choices=['D-CDRR', 'F-CDRR', 'D-MAPS', 'F-MAPS'])
-	parser.add_argument('-p','--period', help='Period to fetch', default='LAST_MONTH', choices=['THIS_MONTH', 'LAST_MONTH', 'LAST_3_MONTHS', 'LAST_6_MONTHS', 'LAST_12_MONTHS'])
+	parser.add_argument('-p','--period', help='Period to fetch', default='LAST_MONTH', choices=['LAST_MONTH', 'LAST_3_MONTHS', 'LAST_6_MONTHS', 'LAST_9_MONTHS', 'LAST_12_MONTHS'])
 	args = vars(parser.parse_args())
 
 	#Get configuration
@@ -177,10 +163,17 @@ if __name__ == '__main__':
 	#Get content
 	if(content == 'metadata'):
 		dataset = args['dataset']
-		organisation_units = [dhiscode for dhiscode in get_content(serverObj, cfg['urls']['facility'], cfg['indices']['facility'])]
-		data_elements, category_options, dataset_name = get_metadata(serverObj, cfg['urls'][content], cfg['urls']['element'], cfg['datasets'][dataset])
-		dataUrls = get_data_urls(organisation_units, data_elements, category_options, dataset_name, cfg['urls']['analytics'], args['period'])
-		data = get_data(serverObj, dataUrls, cfg['category'])
+		#Get ordering site org_units
+		if dataset in ['D-CDRR', 'D-MAPS']:
+			organisation_units = [dhiscode for dhiscode in get_content(serverObj, cfg['urls']['central_grp'], cfg['indices']['central_grp'])]
+			data_elements, category_options, dataset_name = get_metadata(serverObj, cfg['urls'][content], cfg['urls']['element'], cfg['datasets'][dataset])
+			dataUrls = get_data_urls(organisation_units, data_elements, category_options, cfg['datasets'][dataset], cfg['urls']['datavaluesgrp'], args['period'])
+		else:
+			organisation_units = [dhiscode for dhiscode in get_content(serverObj, cfg['urls']['facility'], cfg['indices']['facility'])]
+			data_elements, category_options, dataset_name = get_metadata(serverObj, cfg['urls'][content], cfg['urls']['element'], cfg['datasets'][dataset])
+			dataUrls = get_data_urls(organisation_units, data_elements, category_options, cfg['datasets'][dataset], cfg['urls']['datavalues'], args['period'])
+		#Get and save data
+		data = get_data(serverObj, dataUrls, cfg['category'], dataset, dbconn)
 		process_data(dbconn, data, dataset)
 	else:
 		if content in ['county', 'subcounty', 'datasets']:
@@ -205,7 +198,6 @@ if __name__ == '__main__':
 				save_orgs(dbconn, satellites, parent_mfl)
 				#Update progress bar
 				percentage.update()
-			
 		else: 
 			orgs = get_org_content(serverObj, cfg['urls'][content], cfg['indices'][content], content)
 			save_orgs(dbconn, orgs)
