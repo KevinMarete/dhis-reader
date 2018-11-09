@@ -22,7 +22,7 @@ BEGIN
 		REPLACE INTO tbl_cdrr_log(description, created, user_id, cdrr_id) SELECT 'pending' status, NOW() created, '1' user_id, o.report_id cdrr_id FROM tbl_order o INNER JOIN tbl_facility f ON f.id = o.facility GROUP BY o.facility, o.period;
 
 		/*Update dimension to drug_id*/
-		UPDATE tbl_order o INNER JOIN tbl_dhis_elements de ON de.dhis_code = o.dimension AND de.target_report = ordcode SET o.dimension = de.target_id;
+		UPDATE tbl_order o INNER JOIN tbl_dhis_elements de ON de.dhis_code = o.dimension SET o.dimension = de.target_id;
 	ELSE
 		/*Drop unique index*/
 		ALTER TABLE tbl_order DROP INDEX facility_period_dimension_category;
@@ -118,7 +118,7 @@ BEGIN
 		REPLACE INTO tbl_maps_log(description, created, user_id, maps_id) SELECT 'pending' status, NOW() created, '1' user_id, o.report_id maps_id FROM tbl_order o INNER JOIN tbl_facility f ON f.id = o.facility GROUP BY o.facility, o.period;
 
 		/*Update dimension to regimen_id*/
-		UPDATE tbl_order o INNER JOIN tbl_dhis_elements de ON de.dhis_code = o.dimension AND de.target_report = ordcode SET o.dimension = de.target_id;
+		UPDATE tbl_order o INNER JOIN tbl_dhis_elements de ON de.dhis_code = o.dimension SET o.dimension = de.target_id;
     ELSE
     	/*Drop unique index*/
 		ALTER TABLE tbl_order DROP INDEX facility_period_dimension_category;
