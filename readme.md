@@ -15,4 +15,4 @@ Setup:
 Usage:
 ------
 
-- Run from command-line: `python main.py`
+- Run from command-line: `python main.py -c metadata -ds F-CDRR -p LAST_MONTH`
