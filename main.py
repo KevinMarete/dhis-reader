@@ -60,13 +60,14 @@ def get_period_dates(period_str):
 	return period_dates
 
 def get_data_urls(organisation_units, data_elements, category_options, dataset_name, datavaluesURL, period_str):
+	urls = []
 	_orgchunk = 100
 	_orgchunks = [organisation_units[i:i + _orgchunk] for i in range(0, len(organisation_units), _orgchunk)]
 	for period_date in get_period_dates(period_str):
 		if dataset_name in ['rk2yudsNrm5', 'ZddkIXm6FDw']:
-			urls = [datavaluesURL.format(dataset_name, period_date, '&orgUnitGroup='.join(chunk)) for chunk in _orgchunks]
+			urls.append([datavaluesURL.format(dataset_name, period_date, '&orgUnitGroup='.join(chunk)) for chunk in _orgchunks])
 		else:
-			urls = [datavaluesURL.format(dataset_name, period_date, '&orgUnit='.join(chunk)) for chunk in _orgchunks]
+			urls.append([datavaluesURL.format(dataset_name, period_date, '&orgUnit='.join(chunk)) for chunk in _orgchunks])
 	return urls
 
 def get_data(server, dataUrls, category, dataset, dbconn):
@@ -116,7 +117,6 @@ def process_data(dbconn, data, dataset):
 
 	#Close cursor and connection
 	cursor.close()
-	dbconn.close()
 
 def save_orgs(dbconn, data, parent_mfl = None):
 	cursor = dbconn.cursor()
@@ -173,8 +173,9 @@ if __name__ == '__main__':
 			data_elements, category_options, dataset_name = get_metadata(serverObj, cfg['urls'][content], cfg['urls']['element'], cfg['datasets'][dataset])
 			dataUrls = get_data_urls(organisation_units, data_elements, category_options, cfg['datasets'][dataset], cfg['urls']['datavalues'], args['period'])
 		#Get and save data
-		data = get_data(serverObj, dataUrls, cfg['category'], dataset, dbconn)
-		process_data(dbconn, data, dataset)
+		for dataUrl in dataUrls:
+			data = get_data(serverObj, dataUrl, cfg['category'], dataset, dbconn)
+			process_data(dbconn, data, dataset)
 	else:
 		if content in ['county', 'subcounty', 'datasets']:
 			print get_content(serverObj, cfg['urls'][content], cfg['indices'][content])
