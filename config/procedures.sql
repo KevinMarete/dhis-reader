@@ -10,7 +10,7 @@ BEGIN
 		UPDATE tbl_order o INNER JOIN tbl_facility f ON f.dhiscode = o.facility SET o.facility = f.id;
 
 		/*Format period to period_begin date type*/
-		UPDATE tbl_order o SET o.period = DATE_FORMAT(STR_TO_DATE(o.period, '%Y%m') , "%Y-%m-01");
+		UPDATE tbl_order o SET o.period = STR_TO_DATE(CONCAT_WS('-', o.period,'01'),'%Y%m-%e');
 
 		/*Upsert cdrr from tbl_order*/
 		REPLACE INTO tbl_cdrr(status, created, updated, code, period_begin, period_end, non_arv, facility_id) SELECT 'pending' status, NOW() created, NOW() updated, ordcode code, o.period period_begin, LAST_DAY(o.period) period_end, 0 non_arv, o.facility facility_id FROM tbl_order o INNER JOIN tbl_facility f ON f.id = o.facility GROUP BY o.facility, o.period;
@@ -44,7 +44,7 @@ BEGIN
 		ALTER TABLE tbl_order ADD UNIQUE facility_period_dimension_category (facility, period, dimension, category);
 
 		/*Format period to period_begin date type*/
-		UPDATE tbl_order o SET o.period = DATE_FORMAT(STR_TO_DATE(o.period, '%Y%m') , "%Y-%m-01");
+		UPDATE tbl_order o SET o.period = STR_TO_DATE(CONCAT_WS('-', o.period,'01'),'%Y%m-%e');
 
 		/*Upsert cdrr from tbl_order*/
 		REPLACE INTO tbl_cdrr(status, created, updated, code, period_begin, period_end, non_arv, facility_id) SELECT 'pending' status, NOW() created, NOW() updated, ordcode code, o.period period_begin, LAST_DAY(o.period) period_end, 0 non_arv, o.facility facility_id FROM tbl_order o INNER JOIN tbl_facility f ON f.id = o.facility GROUP BY o.facility, o.period;
@@ -106,7 +106,7 @@ BEGIN
 		UPDATE tbl_order o INNER JOIN tbl_facility f ON f.dhiscode = o.facility SET o.facility = f.id;
 
 		/*Format period to period_begin date type*/
-		UPDATE tbl_order o SET o.period = DATE_FORMAT(STR_TO_DATE(o.period, '%Y%m') , "%Y-%m-01");
+		UPDATE tbl_order o SET o.period = STR_TO_DATE(CONCAT_WS('-', o.period,'01'),'%Y%m-%e');
 
 		/*Upsert maps from tbl_order*/
 		REPLACE INTO tbl_maps(status, created, updated, code, period_begin, period_end, facility_id) SELECT 'pending' status, NOW() created, NOW() updated, ordcode code, o.period period_begin, LAST_DAY(o.period) period_end, o.facility facility_id FROM tbl_order o INNER JOIN tbl_facility f ON f.id = o.facility GROUP BY o.facility, o.period;
@@ -139,7 +139,7 @@ BEGIN
 		UPDATE tbl_order SET category = 'total' WHERE category = 'aggr_total';
 
 		/*Format period to period_begin date type*/
-		UPDATE tbl_order o SET o.period = DATE_FORMAT(STR_TO_DATE(o.period, '%Y%m') , "%Y-%m-01");
+		UPDATE tbl_order o SET o.period = STR_TO_DATE(CONCAT_WS('-', o.period,'01'),'%Y%m-%e');
 
 		/*Upsert maps from tbl_order*/
 		REPLACE INTO tbl_maps(status, created, updated, code, period_begin, period_end, facility_id) SELECT 'pending' status, NOW() created, NOW() updated, ordcode code, o.period period_begin, LAST_DAY(o.period) period_end, o.facility facility_id FROM tbl_order o INNER JOIN tbl_facility f ON f.id = o.facility GROUP BY o.facility, o.period;
