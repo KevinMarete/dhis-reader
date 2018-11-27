@@ -129,7 +129,7 @@ def save_orgs(dbconn, data, parent_mfl = None):
 				org[2] = 'central'
 		#Run proc	
 		try:
-			cursor.callproc('proc_update_dhis', org)
+			cursor.callproc('proc_save_facility_dhis', org)
 			dbconn.commit() 
 		except Exception, e:
 			print org
