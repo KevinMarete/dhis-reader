@@ -245,6 +245,7 @@ CREATE PROCEDURE proc_save_dsh_tables(
     IN p_begin DATE
     )
 BEGIN
+	SET @@foreign_key_checks = 0;
     /*tbl_consumption*/
     REPLACE INTO tbl_consumption(total, allocated, period_year, period_month, facility_id, drug_id) 
     SELECT SUM(ci.dispensed_packs) dispensed, SUM(ci.qty_allocated) allocated, YEAR(c.period_begin) period_year, MONTHNAME(c.period_begin) period_month, c.facility_id, ci.drug_id 
@@ -447,5 +448,6 @@ BEGIN
     INNER JOIN tbl_county co ON co.id = cs.county_id
     WHERE c.period_begin = p_begin
     GROUP by drug, facility_category, facility, county, sub_county, data_month, data_year;
+    SET @@foreign_key_checks = 1;
 END//
 DELIMITER ;
