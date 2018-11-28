@@ -204,7 +204,7 @@ if __name__ == '__main__':
 			data = get_data(serverObj, dataUrl, cfg['category'], dataset, dbconn)
 			process_data(dbconn, data, dataset)
 		#Run when final D-MAPS runs
-		for full_date in get_period_fulldates(period_str):
+		for full_date in get_period_fulldates(args['period']):
 			if dataset == 'D-MAPS':
 				save_dsh_data(dbconn, full_date)
 	else:
