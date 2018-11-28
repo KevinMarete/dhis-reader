@@ -59,6 +59,22 @@ def get_period_dates(period_str):
 
 	return period_dates
 
+def get_period_fulldates(period_str):
+	import datetime
+	from dateutil.relativedelta import relativedelta
+
+	period_dates = []
+	period_list = {'LAST_MONTH': 2, 'LAST_3_MONTHS': 4, 'LAST_6_MONTHS': 7, 'LAST_9_MONTHS': 10, 'LAST_12_MONTHS': 13}
+	i = 1
+	d = datetime.date.today()
+
+	while i < period_list[period_str]:
+		d2 = d - relativedelta(months=i)
+		i += 1
+		period_dates.append(d2.strftime('%Y-%m-01'))
+
+	return period_dates
+
 def get_data_urls(organisation_units, data_elements, category_options, dataset_name, datavaluesURL, period_str):
 	urls = []
 	_orgchunk = 100
@@ -137,6 +153,17 @@ def save_orgs(dbconn, data, parent_mfl = None):
 	#Close cursor
 	cursor.close()
 
+def save_dsh_data(dbconn, full_date):
+	try:
+		cursor = dbconn.cursor()
+		cursor.callproc('proc_save_dsh_tables', [full_date])
+		dbconn.commit() 
+	except Exception, e:
+		print e
+
+	#Close cursor and connection
+	cursor.close()
+
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='DHIS Reader')
 	parser.add_argument('-c','--content', help='Content to fetch', required=True, choices=['county', 'subcounty', 'datasets', 'metadata', 'central', 'standalone'])
@@ -176,6 +203,10 @@ if __name__ == '__main__':
 		for dataUrl in dataUrls:
 			data = get_data(serverObj, dataUrl, cfg['category'], dataset, dbconn)
 			process_data(dbconn, data, dataset)
+		#Run when final D-MAPS runs
+		for full_date in get_period_fulldates(period_str):
+			if dataset == 'D-MAPS':
+				save_dsh_data(dbconn, full_date)
 	else:
 		if content in ['county', 'subcounty', 'datasets']:
 			print get_content(serverObj, cfg['urls'][content], cfg['indices'][content])
