@@ -3,6 +3,7 @@ import configparser
 import requests
 import pyprind
 import pymysql.cursors
+import warnings
 
 def get_server_connection(serverUrl, username, password):
     server = requests.Session()
@@ -155,9 +156,11 @@ def save_orgs(dbconn, data, parent_mfl = None):
 
 def save_dsh_data(dbconn, full_date):
 	try:
-		cursor = dbconn.cursor()
-		cursor.callproc('proc_save_dsh_tables', [full_date])
-		dbconn.commit() 
+		with warnings.catch_warnings():
+			warnings.simplefilter("ignore")
+			cursor = dbconn.cursor()
+			cursor.callproc('proc_save_dsh_tables', [full_date])
+			dbconn.commit() 
 	except Exception, e:
 		print e
 
@@ -169,6 +172,7 @@ if __name__ == '__main__':
 	parser.add_argument('-c','--content', help='Content to fetch', required=True, choices=['county', 'subcounty', 'datasets', 'metadata', 'central', 'standalone'])
 	parser.add_argument('-ds','--dataset', help='Dataset to fetch', default='D-CDRR', choices=['D-CDRR', 'F-CDRR', 'D-MAPS', 'F-MAPS'])
 	parser.add_argument('-p','--period', help='Period to fetch', default='LAST_MONTH', choices=['LAST_MONTH', 'LAST_3_MONTHS', 'LAST_6_MONTHS', 'LAST_9_MONTHS', 'LAST_12_MONTHS'])
+	parser.add_argument('-dsb','--dashboard', help='Push data to dashboard tables', default='No', choices=['Yes', 'No'])
 	args = vars(parser.parse_args())
 
 	#Get configuration
@@ -205,7 +209,7 @@ if __name__ == '__main__':
 			process_data(dbconn, data, dataset)
 		#Run when final D-MAPS runs
 		for full_date in get_period_fulldates(args['period']):
-			if dataset == 'D-MAPS':
+			if args['dashboard'] == 'Yes':
 				save_dsh_data(dbconn, full_date)
 	else:
 		if content in ['county', 'subcounty', 'datasets']:
