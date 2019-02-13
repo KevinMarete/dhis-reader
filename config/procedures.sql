@@ -12,14 +12,14 @@ BEGIN
 		/*Format period to period_begin date type*/
 		UPDATE tbl_order o SET o.period = STR_TO_DATE(CONCAT_WS('-', o.period,'01'),'%Y%m-%e');
 
-		/*Delete orders [allocated | approved | reviewed]*/
-		DELETE FROM tbl_order WHERE (facility, period) IN (SELECT c.facility_id, c.period_begin FROM tbl_cdrr c WHERE c.code = ordcode AND c.status IN ('allocated', 'approved', 'reviewed'));
+		/*Delete orders [rejected | allocated | approved | reviewed]*/
+		DELETE FROM tbl_order WHERE (facility, period) IN (SELECT c.facility_id, c.period_begin FROM tbl_cdrr c WHERE c.code = ordcode AND c.status IN ('rejected', 'allocated', 'approved', 'reviewed'));
 
 		/*Add qty_allocated figures*/
-		REPLACE INTO tbl_order(facility, period, dimension, category, value) SELECT c.facility_id, c.period_begin, ci.drug_id, 'qty_allocated', ci.qty_allocated FROM tbl_cdrr_item ci INNER JOIN tbl_cdrr c ON c.id = ci.cdrr_id WHERE c.code = ordcode AND c.status IN ('prepared', 'rejected') AND ci.qty_allocated IS NOT NULL;
+		REPLACE INTO tbl_order(facility, period, dimension, category, value) SELECT c.facility_id, c.period_begin, ci.drug_id, 'qty_allocated', ci.qty_allocated FROM tbl_cdrr_item ci INNER JOIN tbl_cdrr c ON c.id = ci.cdrr_id WHERE c.code = ordcode AND c.status IN ('prepared') AND ci.qty_allocated IS NOT NULL;
 
 		/*Add qty_allocated_mos figures*/
-		REPLACE INTO tbl_order(facility, period, dimension, category, value) SELECT c.facility_id, c.period_begin, ci.drug_id, 'qty_allocated_mos', ci.qty_allocated_mos FROM tbl_cdrr_item ci INNER JOIN tbl_cdrr c ON c.id = ci.cdrr_id WHERE c.code = ordcode AND c.status IN ('prepared', 'rejected') AND ci.qty_allocated_mos IS NOT NULL;
+		REPLACE INTO tbl_order(facility, period, dimension, category, value) SELECT c.facility_id, c.period_begin, ci.drug_id, 'qty_allocated_mos', ci.qty_allocated_mos FROM tbl_cdrr_item ci INNER JOIN tbl_cdrr c ON c.id = ci.cdrr_id WHERE c.code = ordcode AND c.status IN ('prepared') AND ci.qty_allocated_mos IS NOT NULL;
 
 		/*Upsert cdrr from tbl_order*/
 		REPLACE INTO tbl_cdrr(status, created, updated, code, period_begin, period_end, non_arv, facility_id) SELECT 'pending' status, NOW() created, NOW() updated, ordcode code, o.period period_begin, LAST_DAY(o.period) period_end, 0 non_arv, o.facility facility_id FROM tbl_order o INNER JOIN tbl_facility f ON f.id = o.facility GROUP BY o.facility, o.period;
@@ -55,14 +55,14 @@ BEGIN
 		/*Format period to period_begin date type*/
 		UPDATE tbl_order o SET o.period = STR_TO_DATE(CONCAT_WS('-', o.period,'01'),'%Y%m-%e');
 
-		/*Delete orders [allocated | approved | reviewed]*/
-		DELETE FROM tbl_order WHERE (facility, period) IN (SELECT c.facility_id, c.period_begin FROM tbl_cdrr c WHERE c.code = ordcode AND c.status IN ('allocated', 'approved', 'reviewed'));
+		/*Delete orders [rejected | allocated | approved | reviewed]*/
+		DELETE FROM tbl_order WHERE (facility, period) IN (SELECT c.facility_id, c.period_begin FROM tbl_cdrr c WHERE c.code = ordcode AND c.status IN ('rejected', 'allocated', 'approved', 'reviewed'));
 		
 		/*Add qty_allocated figures*/
-		REPLACE INTO tbl_order(facility, period, dimension, category, value) SELECT c.facility_id, c.period_begin, ci.drug_id, 'qty_allocated', ci.qty_allocated FROM tbl_cdrr_item ci INNER JOIN tbl_cdrr c ON c.id = ci.cdrr_id WHERE c.code = ordcode AND c.status IN ('prepared', 'rejected') AND ci.qty_allocated IS NOT NULL;
+		REPLACE INTO tbl_order(facility, period, dimension, category, value) SELECT c.facility_id, c.period_begin, ci.drug_id, 'qty_allocated', ci.qty_allocated FROM tbl_cdrr_item ci INNER JOIN tbl_cdrr c ON c.id = ci.cdrr_id WHERE c.code = ordcode AND c.status IN ('prepared') AND ci.qty_allocated IS NOT NULL;
 
 		/*Add qty_allocated_mos figures*/
-		REPLACE INTO tbl_order(facility, period, dimension, category, value) SELECT c.facility_id, c.period_begin, ci.drug_id, 'qty_allocated_mos', ci.qty_allocated_mos FROM tbl_cdrr_item ci INNER JOIN tbl_cdrr c ON c.id = ci.cdrr_id WHERE c.code = ordcode AND c.status IN ('prepared', 'rejected') AND ci.qty_allocated_mos IS NOT NULL;
+		REPLACE INTO tbl_order(facility, period, dimension, category, value) SELECT c.facility_id, c.period_begin, ci.drug_id, 'qty_allocated_mos', ci.qty_allocated_mos FROM tbl_cdrr_item ci INNER JOIN tbl_cdrr c ON c.id = ci.cdrr_id WHERE c.code = ordcode AND c.status IN ('prepared') AND ci.qty_allocated_mos IS NOT NULL;
 
 		/*Upsert cdrr from tbl_order*/
 		REPLACE INTO tbl_cdrr(status, created, updated, code, period_begin, period_end, non_arv, facility_id) SELECT 'pending' status, NOW() created, NOW() updated, ordcode code, o.period period_begin, LAST_DAY(o.period) period_end, 0 non_arv, o.facility facility_id FROM tbl_order o INNER JOIN tbl_facility f ON f.id = o.facility GROUP BY o.facility, o.period;
@@ -125,8 +125,8 @@ BEGIN
 		/*Format period to period_begin date type*/
 		UPDATE tbl_order o SET o.period = STR_TO_DATE(CONCAT_WS('-', o.period,'01'),'%Y%m-%e');
 
-		/*Delete orders [allocated | approved | reviewed]*/
-		DELETE FROM tbl_order WHERE (facility, period) IN (SELECT m.facility_id, m.period_begin FROM tbl_maps m WHERE m.code = ordcode AND m.status IN ('allocated', 'approved', 'reviewed'));
+		/*Delete orders [rejected | allocated | approved | reviewed]*/
+		DELETE FROM tbl_order WHERE (facility, period) IN (SELECT m.facility_id, m.period_begin FROM tbl_maps m WHERE m.code = ordcode AND m.status IN ('rejected', 'allocated', 'approved', 'reviewed'));
 		
 		/*Upsert maps from tbl_order*/
 		REPLACE INTO tbl_maps(status, created, updated, code, period_begin, period_end, facility_id) SELECT 'pending' status, NOW() created, NOW() updated, ordcode code, o.period period_begin, LAST_DAY(o.period) period_end, o.facility facility_id FROM tbl_order o INNER JOIN tbl_facility f ON f.id = o.facility GROUP BY o.facility, o.period;
@@ -161,8 +161,8 @@ BEGIN
 		/*Format period to period_begin date type*/
 		UPDATE tbl_order o SET o.period = STR_TO_DATE(CONCAT_WS('-', o.period,'01'),'%Y%m-%e');
 
-		/*Delete orders [allocated | approved | reviewed]*/
-		DELETE FROM tbl_order WHERE (facility, period) IN (SELECT m.facility_id, m.period_begin FROM tbl_maps m WHERE m.code = ordcode AND m.status IN ('allocated', 'approved', 'reviewed'));
+		/*Delete orders [rejected | allocated | approved | reviewed]*/
+		DELETE FROM tbl_order WHERE (facility, period) IN (SELECT m.facility_id, m.period_begin FROM tbl_maps m WHERE m.code = ordcode AND m.status IN ('rejected', 'allocated', 'approved', 'reviewed'));
 
 		/*Upsert maps from tbl_order*/
 		REPLACE INTO tbl_maps(status, created, updated, code, period_begin, period_end, facility_id) SELECT 'pending' status, NOW() created, NOW() updated, ordcode code, o.period period_begin, LAST_DAY(o.period) period_end, o.facility facility_id FROM tbl_order o INNER JOIN tbl_facility f ON f.id = o.facility GROUP BY o.facility, o.period;
