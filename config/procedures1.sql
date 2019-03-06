@@ -534,7 +534,7 @@ BEGIN
     INNER JOIN vw_drug_list d ON ci.drug_id = d.id
     INNER JOIN tbl_maps m ON m.facility_id = c.facility_id AND c.period_begin = m.period_begin AND SUBSTRING(c.code, 1, 1) = SUBSTRING(m.code, 1, 1)
     INNER JOIN tbl_facility f ON c.facility_id = f.id
-	LEFT JOIN tbl_partner p ON p.id = f.partner_idy
+	LEFT JOIN tbl_partner p ON p.id = f.partner_id
     INNER JOIN tbl_subcounty cs ON cs.id = f.subcounty_id
     INNER JOIN tbl_county co ON co.id = cs.county_id
     WHERE c.period_begin = p_begin
