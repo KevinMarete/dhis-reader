@@ -1,0 +1,777 @@
+{
+	"info": {
+		"_postman_id": "aab68701-afc2-493b-b189-883bbde51dcc",
+		"name": "DHIS2",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "F-MAPS",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Ngugi1234",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "tngugi",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://hiskenya.org/api/dataValueSets.json?dataSet=mgaZyW3Xzyf&period=201809&orgUnit=KFaSkuOoYYU",
+					"protocol": "https",
+					"host": [
+						"hiskenya",
+						"org"
+					],
+					"path": [
+						"api",
+						"dataValueSets.json"
+					],
+					"query": [
+						{
+							"key": "dataSet",
+							"value": "mgaZyW3Xzyf"
+						},
+						{
+							"key": "period",
+							"value": "201809"
+						},
+						{
+							"key": "orgUnit",
+							"value": "KFaSkuOoYYU"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "D-MAPS",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Ngugi1234",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "tngugi",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://hiskenya.org/api/dataValueSets.json?dataSet=ZddkIXm6FDw&period=201809&orgUnit=KFaSkuOoYYU",
+					"protocol": "https",
+					"host": [
+						"hiskenya",
+						"org"
+					],
+					"path": [
+						"api",
+						"dataValueSets.json"
+					],
+					"query": [
+						{
+							"key": "dataSet",
+							"value": "ZddkIXm6FDw"
+						},
+						{
+							"key": "period",
+							"value": "201809"
+						},
+						{
+							"key": "orgUnit",
+							"value": "KFaSkuOoYYU"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "F-CDRR",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Ngugi1234",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "tngugi",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://hiskenya.org/api/dataValueSets.json?dataSet=OSulH5zPHPw&period=201809&orgUnit=KFaSkuOoYYU",
+					"protocol": "https",
+					"host": [
+						"hiskenya",
+						"org"
+					],
+					"path": [
+						"api",
+						"dataValueSets.json"
+					],
+					"query": [
+						{
+							"key": "dataSet",
+							"value": "OSulH5zPHPw"
+						},
+						{
+							"key": "period",
+							"value": "201809"
+						},
+						{
+							"key": "orgUnit",
+							"value": "KFaSkuOoYYU"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "D-CDRR",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Ngugi1234",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "tngugi",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://hiskenya.org/api/dataValueSets.json?dataSet=rk2yudsNrm5&period=201809&orgUnit=KFaSkuOoYYU",
+					"protocol": "https",
+					"host": [
+						"hiskenya",
+						"org"
+					],
+					"path": [
+						"api",
+						"dataValueSets.json"
+					],
+					"query": [
+						{
+							"key": "dataSet",
+							"value": "rk2yudsNrm5"
+						},
+						{
+							"key": "period",
+							"value": "201809"
+						},
+						{
+							"key": "orgUnit",
+							"value": "KFaSkuOoYYU"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "F-CDRR (Multiple)",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Ngugi1234",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "tngugi",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://hiskenya.org/api/dataValueSets.json?dataSet=OSulH5zPHPw&period=201809&orgUnit=KFaSkuOoYYU&orgUnit=JgBnZEcsqDR&orgUnit=ZWwPSTkiLWX",
+					"protocol": "https",
+					"host": [
+						"hiskenya",
+						"org"
+					],
+					"path": [
+						"api",
+						"dataValueSets.json"
+					],
+					"query": [
+						{
+							"key": "dataSet",
+							"value": "OSulH5zPHPw"
+						},
+						{
+							"key": "period",
+							"value": "201809"
+						},
+						{
+							"key": "orgUnit",
+							"value": "KFaSkuOoYYU"
+						},
+						{
+							"key": "orgUnit",
+							"value": "JgBnZEcsqDR"
+						},
+						{
+							"key": "orgUnit",
+							"value": "ZWwPSTkiLWX"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "D-CDRR(Multiple)",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Ngugi1234",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "tngugi",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://hiskenya.org/api/dataValueSets.json?dataSet=rk2yudsNrm5&period=201810&orgUnit=qa07L6R8UeS&orgUnit=KFaSkuOoYYU&orgUnit=ZWwPSTkiLWX&=",
+					"protocol": "https",
+					"host": [
+						"hiskenya",
+						"org"
+					],
+					"path": [
+						"api",
+						"dataValueSets.json"
+					],
+					"query": [
+						{
+							"key": "dataSet",
+							"value": "rk2yudsNrm5"
+						},
+						{
+							"key": "period",
+							"value": "201810"
+						},
+						{
+							"key": "orgUnit",
+							"value": "qa07L6R8UeS"
+						},
+						{
+							"key": "orgUnit",
+							"value": "KFaSkuOoYYU"
+						},
+						{
+							"key": "orgUnit",
+							"value": "ZWwPSTkiLWX"
+						},
+						{
+							"key": "",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Original Endpoint",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Ngugi1234",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "tngugi",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://hiskenya.org/api/analytics?dimension=pe:LAST_MONTH;&dimension=ou:bOV4i14mXvI;epdkO0a3gPN;NQXKqtrIilC;TGQjTkSUH6w;vsvcd1x7ARW;NP7CdJzEwO0;FsReseYwXJG;vyBX6wjZxAa;MfyajFElghr;C7VJ1e15DMm;sS95RyqYQ0d;BfXev56jWm1;YRb6CGJR67E;XPJ2YoetcBX;Pjcbi0XJi3f;VINAriLkHL5;k8PiFOYOIQQ;MxxUSfpmXEr;bxNwHSFd0f1;tFA8Zjw1MR8;nU0IUSP4a2b;sL4A85fJAXA;HEguhCKMOjs;WJU4rTl6QU1;y0eGlH5XYXx;XjHs6IJ3K0d;Q63aF4etAzK;t45No8qwfqT;G39oy4vmOnb;rzxD5SSsdYS;P1rL0rpDHBV;a9xTLztQg09;twDdaYmIouR;gAvIaQSDIQZ;NPiZAGPNxGD;tcuKkQWAPTF;LJsOGp1YGFM;UQfN8yEbQ3N;uZ5wen4Emyh;aX2ThTzHWkV;K9W2r0t0kzt;PJ8zrVDzBVA;LVcfwqRE46c;Y1wbtycY0V8;qcnO9Oo6n3g;WzIfzN4cqMu;wsodBYGquwj;Uvv85m35TMs;SHCtxzGuDSM;z6NaFzIMBFT;QDx1Cr19K3c;ZhDOwErGfV4;h1eregGkvM4;RIY3sOQqFab;EpqNjbLTfwl;Z7ruKy2DyTa;w0QBLXNdhK1;iK6yDFIUSSg;KH6QqTXH7Zs;KOP1PjuP70T;IRuvgP1svAx;ke4moKRIpK6;dx6XwBdUB2q;eCko01bXFTn;umoUPlYdSsd;VjT4hdkblqM;gEEJqBQ2vqX;gl6ZiEljECt;tP9Wb2hdTP6;Tkx50aupWkz;Cd0A3b9EpZz;Q1YHVG2A0U1;zhKMkZZX3Eq;zt33fI4VGe8;Hi8bvJz4Piu;aLtQReV8YLe;CCtjKGD19ba;qa07L6R8UeS;tGo0KUb4CSN;CctsHfr4MXU;p7OxeJQ5XoL;jep8ixiYEw0;OVCa0H5oEK0;l5obasL82Zz;aUIWXri20KS;kQpcyHWC1Mw;fi4t3iRQ5Ng;xAm2ZjwZJjG;tiI9qrpW3VL;TCfLCyeAYuB;wVVx9HNNi0f;IsPfFl0jTyA;N4dqRN03acg;kcLVit2V5s7;ewcGG9nFLu5;LRiycfx0jQM;pLfEJi4kMFw;OtZ8gtdfEGc;TJnBh1U3GEs;PYVdNPyx7jw;&dimension=dx:Ovk1BBcACSN;GTqdnEoYWpl;KnOB8nSo99l;bW4ekQmQCeb;eeQ9f2aQHE2;dsZqocFWAqm;rMpIsXAIBcN;NRXgJMykiJq;Lo1lUEHEXap;rj7yWKzevzK;hnMei2LGuhw;Qr8Hx7Nl02R;FE6o5uZ6Ey3;YvUG4Tj5pBB;rgrECRA0XVz;lMHWiV1wfzU;GjYg7sEHVAx;ZYYcDSXFHcq;nReJj3EEIHt;Zp4GO6RalC3;VJMNX2JtVAL;ynIttHBVTyK;cgSXbyWnsji;Fmu24faR6RP;WeA3sq0ELOE;MtiBOPPd7Ke;ow27FKynLOP;jC1clm8DHjU;XYarFhtrZnM;ScMZvEURp0k;ZPdNDKh0jtf;U3h59Gd6zNP;HTN8wtCULbh;hI5dsFlNwro;noIMGcbffat;w96pwQ6povd;gjOJC5nWO9W;BHlhxD6Wjct;YpjdjMD6yeC;uYwZjUIeoY2;Ywi6QrCf4wp;FWfv9nwqQNj;CUkg2rMIBqV;L9VlZFQZGbv;bNwb0BQTiXu;wJTbaU9jnf2;bjqajaEgKDD;LdqZPGOt7px;rS62iKZ6Idq;YUbsR6vuIVF;r3zeScG21hV;Fo2gnhRx1eB;CV5vmItEeGO;KPNtoZA2hVb;JfkxhCPe29t;Bv08ScvBzZy;k820rGmrG7y;T0j4amtuSwQ&dimension=co:au01wT2arrb;LnBWc52xCTM;qCtxxPhLuDT;FHLQOx4RuRA;gxngbfUuGaW;EvsMkfv73ri;mXdY3dGvrtV;lHX6KaHlXeh;BASW4HFXPfT;AODxZG2gTNc;d9T4GElIVYg;fC50Qz9bElf.json&hierarchyMeta=true&paging=false",
+					"protocol": "https",
+					"host": [
+						"hiskenya",
+						"org"
+					],
+					"path": [
+						"api",
+						"analytics"
+					],
+					"query": [
+						{
+							"key": "dimension",
+							"value": "pe:LAST_MONTH;"
+						},
+						{
+							"key": "dimension",
+							"value": "ou:bOV4i14mXvI;epdkO0a3gPN;NQXKqtrIilC;TGQjTkSUH6w;vsvcd1x7ARW;NP7CdJzEwO0;FsReseYwXJG;vyBX6wjZxAa;MfyajFElghr;C7VJ1e15DMm;sS95RyqYQ0d;BfXev56jWm1;YRb6CGJR67E;XPJ2YoetcBX;Pjcbi0XJi3f;VINAriLkHL5;k8PiFOYOIQQ;MxxUSfpmXEr;bxNwHSFd0f1;tFA8Zjw1MR8;nU0IUSP4a2b;sL4A85fJAXA;HEguhCKMOjs;WJU4rTl6QU1;y0eGlH5XYXx;XjHs6IJ3K0d;Q63aF4etAzK;t45No8qwfqT;G39oy4vmOnb;rzxD5SSsdYS;P1rL0rpDHBV;a9xTLztQg09;twDdaYmIouR;gAvIaQSDIQZ;NPiZAGPNxGD;tcuKkQWAPTF;LJsOGp1YGFM;UQfN8yEbQ3N;uZ5wen4Emyh;aX2ThTzHWkV;K9W2r0t0kzt;PJ8zrVDzBVA;LVcfwqRE46c;Y1wbtycY0V8;qcnO9Oo6n3g;WzIfzN4cqMu;wsodBYGquwj;Uvv85m35TMs;SHCtxzGuDSM;z6NaFzIMBFT;QDx1Cr19K3c;ZhDOwErGfV4;h1eregGkvM4;RIY3sOQqFab;EpqNjbLTfwl;Z7ruKy2DyTa;w0QBLXNdhK1;iK6yDFIUSSg;KH6QqTXH7Zs;KOP1PjuP70T;IRuvgP1svAx;ke4moKRIpK6;dx6XwBdUB2q;eCko01bXFTn;umoUPlYdSsd;VjT4hdkblqM;gEEJqBQ2vqX;gl6ZiEljECt;tP9Wb2hdTP6;Tkx50aupWkz;Cd0A3b9EpZz;Q1YHVG2A0U1;zhKMkZZX3Eq;zt33fI4VGe8;Hi8bvJz4Piu;aLtQReV8YLe;CCtjKGD19ba;qa07L6R8UeS;tGo0KUb4CSN;CctsHfr4MXU;p7OxeJQ5XoL;jep8ixiYEw0;OVCa0H5oEK0;l5obasL82Zz;aUIWXri20KS;kQpcyHWC1Mw;fi4t3iRQ5Ng;xAm2ZjwZJjG;tiI9qrpW3VL;TCfLCyeAYuB;wVVx9HNNi0f;IsPfFl0jTyA;N4dqRN03acg;kcLVit2V5s7;ewcGG9nFLu5;LRiycfx0jQM;pLfEJi4kMFw;OtZ8gtdfEGc;TJnBh1U3GEs;PYVdNPyx7jw;"
+						},
+						{
+							"key": "dimension",
+							"value": "dx:Ovk1BBcACSN;GTqdnEoYWpl;KnOB8nSo99l;bW4ekQmQCeb;eeQ9f2aQHE2;dsZqocFWAqm;rMpIsXAIBcN;NRXgJMykiJq;Lo1lUEHEXap;rj7yWKzevzK;hnMei2LGuhw;Qr8Hx7Nl02R;FE6o5uZ6Ey3;YvUG4Tj5pBB;rgrECRA0XVz;lMHWiV1wfzU;GjYg7sEHVAx;ZYYcDSXFHcq;nReJj3EEIHt;Zp4GO6RalC3;VJMNX2JtVAL;ynIttHBVTyK;cgSXbyWnsji;Fmu24faR6RP;WeA3sq0ELOE;MtiBOPPd7Ke;ow27FKynLOP;jC1clm8DHjU;XYarFhtrZnM;ScMZvEURp0k;ZPdNDKh0jtf;U3h59Gd6zNP;HTN8wtCULbh;hI5dsFlNwro;noIMGcbffat;w96pwQ6povd;gjOJC5nWO9W;BHlhxD6Wjct;YpjdjMD6yeC;uYwZjUIeoY2;Ywi6QrCf4wp;FWfv9nwqQNj;CUkg2rMIBqV;L9VlZFQZGbv;bNwb0BQTiXu;wJTbaU9jnf2;bjqajaEgKDD;LdqZPGOt7px;rS62iKZ6Idq;YUbsR6vuIVF;r3zeScG21hV;Fo2gnhRx1eB;CV5vmItEeGO;KPNtoZA2hVb;JfkxhCPe29t;Bv08ScvBzZy;k820rGmrG7y;T0j4amtuSwQ"
+						},
+						{
+							"key": "dimension",
+							"value": "co:au01wT2arrb;LnBWc52xCTM;qCtxxPhLuDT;FHLQOx4RuRA;gxngbfUuGaW;EvsMkfv73ri;mXdY3dGvrtV;lHX6KaHlXeh;BASW4HFXPfT;AODxZG2gTNc;d9T4GElIVYg;fC50Qz9bElf.json"
+						},
+						{
+							"key": "hierarchyMeta",
+							"value": "true"
+						},
+						{
+							"key": "paging",
+							"value": "false"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Facility by Mflcode",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Ngugi1234",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "tngugi",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://hiskenya.org/api/organisationUnits.json?level=5&paging=false&fields=:id,code,name&filter=code:in:[11094,10227,10837,10041]",
+					"protocol": "https",
+					"host": [
+						"hiskenya",
+						"org"
+					],
+					"path": [
+						"api",
+						"organisationUnits.json"
+					],
+					"query": [
+						{
+							"key": "level",
+							"value": "5"
+						},
+						{
+							"key": "paging",
+							"value": "false"
+						},
+						{
+							"key": "fields",
+							"value": ":id,code,name"
+						},
+						{
+							"key": "filter",
+							"value": "code:in:[11094,10227,10837,10041]"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Facility by DHIScode",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Ngugi1234",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "tngugi",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://hiskenya.org/api/organisationUnits.json?level=5&paging=false&fields=:id,code,name&filter=id:in:[IsPfFl0jTyA,vyBX6wjZxAa]",
+					"protocol": "https",
+					"host": [
+						"hiskenya",
+						"org"
+					],
+					"path": [
+						"api",
+						"organisationUnits.json"
+					],
+					"query": [
+						{
+							"key": "level",
+							"value": "5"
+						},
+						{
+							"key": "paging",
+							"value": "false"
+						},
+						{
+							"key": "fields",
+							"value": ":id,code,name"
+						},
+						{
+							"key": "filter",
+							"value": "id:in:[IsPfFl0jTyA,vyBX6wjZxAa]"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Ordering Sites",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Kenya@2018",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "kennedymugambi",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://hiskenya.org/api/organisationUnitGroupSets/tjVYz9cY7I3/organisationUnitGroups?fields=:id,name,&paging=false",
+					"protocol": "https",
+					"host": [
+						"hiskenya",
+						"org"
+					],
+					"path": [
+						"api",
+						"organisationUnitGroupSets",
+						"tjVYz9cY7I3",
+						"organisationUnitGroups"
+					],
+					"query": [
+						{
+							"key": "fields",
+							"value": ":id,name,"
+						},
+						{
+							"key": "paging",
+							"value": "false"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "D-MAPS(Ordering Site)",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Ngugi1234",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "tngugi",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://hiskenya.org/api/dataValueSets.json?dataSet=ZddkIXm6FDw&period=201810&orgUnitGroup=IASqqjQq4rR",
+					"protocol": "https",
+					"host": [
+						"hiskenya",
+						"org"
+					],
+					"path": [
+						"api",
+						"dataValueSets.json"
+					],
+					"query": [
+						{
+							"key": "dataSet",
+							"value": "ZddkIXm6FDw"
+						},
+						{
+							"key": "period",
+							"value": "201810"
+						},
+						{
+							"key": "orgUnitGroup",
+							"value": "IASqqjQq4rR"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "D-CDRR(Ordering Site)",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Ngugi1234",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "tngugi",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://hiskenya.org/api/dataValueSets.json?dataSet=rk2yudsNrm5&period=201810&orgUnitGroup=IASqqjQq4rR",
+					"protocol": "https",
+					"host": [
+						"hiskenya",
+						"org"
+					],
+					"path": [
+						"api",
+						"dataValueSets.json"
+					],
+					"query": [
+						{
+							"key": "dataSet",
+							"value": "rk2yudsNrm5"
+						},
+						{
+							"key": "period",
+							"value": "201810"
+						},
+						{
+							"key": "orgUnitGroup",
+							"value": "IASqqjQq4rR"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Authentication",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "Thikalevel5ccc",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "Judy-2018",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://hiskenya.org/api/me",
+					"protocol": "https",
+					"host": [
+						"hiskenya",
+						"org"
+					],
+					"path": [
+						"api",
+						"me"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Filtering",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Kenya@2018",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "kennedymugambi",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://hiskenya.org/api/organisationUnitGroupSets/tjVYz9cY7I3/organisationUnitGroups?fields=id,name,organisationUnits[id]&paging=false&filter=organisationUnits.id:eq:KFaSkuOoYYU",
+					"protocol": "https",
+					"host": [
+						"hiskenya",
+						"org"
+					],
+					"path": [
+						"api",
+						"organisationUnitGroupSets",
+						"tjVYz9cY7I3",
+						"organisationUnitGroups"
+					],
+					"query": [
+						{
+							"key": "fields",
+							"value": "id,name,organisationUnits[id]"
+						},
+						{
+							"key": "paging",
+							"value": "false"
+						},
+						{
+							"key": "filter",
+							"value": "organisationUnits.id:eq:KFaSkuOoYYU"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
